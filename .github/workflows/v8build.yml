@@ -162,7 +162,14 @@ jobs:
       run: cd deps/depot_tools && git config --unset-all remote.origin.fetch; git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
 
     - name: Build V8 (${{ matrix.os }})
-      run: cd deps && ./build.py --ccache --verbose --arch ${{ matrix.arch }} --os ${{ matrix.os }}
+      run: |
+        extra_args=""
+        if [ "${{ matrix.os }}" = "linux" ]; then
+          # Newer V8 revisions currently fail with GCC; force Clang for Linux.
+          extra_args="--clang"
+        fi
+        cd deps
+        ./build.py --ccache --verbose --arch ${{ matrix.arch }} --os ${{ matrix.os }} $extra_args
 
     - name: Show CCache Status
       run: ccache -s
