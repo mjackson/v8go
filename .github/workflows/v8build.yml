@@ -225,7 +225,9 @@ jobs:
         path: deps
 
     - name: Update LDFLAGS in cgo.go
-      run: ./deps/update_cgo.py
+      run: |
+        root_module="$(awk '/^module / { print $2; exit }' go.mod)"
+        ./deps/update_cgo.py --root-module "$root_module"
 
     - name: Update Changelog
       run: |
@@ -265,7 +267,7 @@ jobs:
 
         echo "V8 Commit: $(<deps/v8_hash)" >>"$GITHUB_STEP_SUMMARY"
         echo "V8 Version: ${{ steps.update_v8.outputs.latest_v8_version }}" >>"$GITHUB_STEP_SUMMARY"
-        echo "Commit: https://github.com/tommie/v8go/commit/$commit_sha" >>"$GITHUB_STEP_SUMMARY"
+        echo "Commit: https://github.com/${{ github.repository }}/commit/$commit_sha" >>"$GITHUB_STEP_SUMMARY"
 
         echo "sha=$commit_sha" >>"$GITHUB_OUTPUT"
 
@@ -315,7 +317,8 @@ jobs:
     - name: Update go.mod
       run: |
         sha="${{ steps.info.outputs.sha }}"
-        submods=( $(for submod in ${{ steps.info.outputs.submodules }}; do echo "github.com/${{ github.repository }}/$submod@$sha" ; done) )
+        root_module="$(awk '/^module / { print $2; exit }' go.mod)"
+        submods=( $(for submod in ${{ steps.info.outputs.submodules }}; do echo "$root_module/$submod@$sha" ; done) )
         go get "${submods[@]}"
 
     - id: commit
@@ -339,6 +342,6 @@ jobs:
         commit_sha="${{ steps.commit.outputs.commit_long_sha }}"
         commit_sha="${commit_sha#HEAD }"
 
-        echo "Commit: https://github.com/tommie/v8go/commit/$commit_sha" >>"$GITHUB_STEP_SUMMARY"
+        echo "Commit: https://github.com/${{ github.repository }}/commit/$commit_sha" >>"$GITHUB_STEP_SUMMARY"
 
         echo "sha=$commit_sha" >>"$GITHUB_OUTPUT"
