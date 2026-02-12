@@ -314,6 +314,14 @@ jobs:
         submods=( ${{ steps.info.outputs.submodules }} )
         go work init . "${submods[@]}"
 
+    - name: Configure Module Fetch for Forks
+      if: ${{ github.repository != 'tommie/v8go' }}
+      run: |
+        git config --global url."https://github.com/${{ github.repository }}".insteadOf "https://github.com/tommie/v8go"
+        echo "GOPROXY=direct" >>"$GITHUB_ENV"
+        echo "GOPRIVATE=github.com/tommie/v8go" >>"$GITHUB_ENV"
+        echo "GONOSUMDB=github.com/tommie/v8go" >>"$GITHUB_ENV"
+
     - name: Update go.mod
       run: |
         sha="${{ steps.info.outputs.sha }}"
