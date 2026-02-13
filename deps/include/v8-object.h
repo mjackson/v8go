@@ -562,7 +562,7 @@ class V8_EXPORT Object : public Value {
   V8_INLINE static void* GetAlignedPointerFromInternalField(
       const PersistentBase<Object>& object, int index) {
     return object.template value<Object>()->GetAlignedPointerFromInternalField(
-        index);
+        index, kEmbedderDataTypeTagDefault);
   }
 
   /** Same as above, but works for TracedReference. */
@@ -579,7 +579,7 @@ class V8_EXPORT Object : public Value {
   V8_INLINE static void* GetAlignedPointerFromInternalField(
       const BasicTracedReference<Object>& object, int index) {
     return object.template value<Object>()->GetAlignedPointerFromInternalField(
-        index);
+        index, kEmbedderDataTypeTagDefault);
   }
 
   /**
