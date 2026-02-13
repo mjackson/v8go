@@ -80,6 +80,7 @@ use_libcxx_modules=false
 use_allocator_shim=false
 use_sysroot=false
 use_glib=false
+use_lto=false
 use_thin_lto=false
 symbol_level=%s
 strip_debug_info=%s

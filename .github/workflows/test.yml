@@ -43,12 +43,6 @@ jobs:
       with:
         go-version: ${{ matrix.go-version }}
 
-    - name: Install Clang and LLD
-      if: matrix.os == 'linux'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y clang lld
-
     - name: Add GOPATH to GITHUB_ENV
       run: echo "GOPATH=$(go env GOPATH)" >>"$GITHUB_ENV"
 
@@ -60,14 +54,10 @@ jobs:
 
     - name: Run Tests With Coverage
       run: |
-        export CGO_CXXFLAGS="-Werror"
-        if [ "${{ matrix.os }}" = "linux" ]; then
-          export CC=clang
-          export CXX=clang++
-          export CGO_LDFLAGS="-fuse-ld=lld"
-        fi
         # https://github.com/tommie/v8go/actions/runs/7363603520/job/20043211523 shows that TestCPUProfileNode can be flaky.
         go test -v -coverprofile coverage.out ./... || go test -v -coverprofile coverage.out ./...
+      env:
+        CGO_CXXFLAGS: "-Werror"
 
     - name: Upload Coverage To Codecov
       uses: codecov/codecov-action@v3
