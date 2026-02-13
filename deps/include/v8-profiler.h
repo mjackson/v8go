@@ -1132,6 +1132,7 @@ class V8_EXPORT HeapProfiler {
     /**
      * The resolver used by the snapshot generator to get names for V8 objects.
      */
+    V8_DEPRECATED("Use context_name_resolver callback instead.")
     ObjectNameResolver* global_object_name_resolver = nullptr;
     /**
      * The resolver used by the snapshot generator to get names for v8::Context
