@@ -7,8 +7,8 @@
 
 package v8go
 
-// #cgo CPPFLAGS: -fsanitize=leak
-// #cgo LDFLAGS: -fsanitize=leak
+// #cgo CPPFLAGS: -fsanitize=address
+// #cgo LDFLAGS: -fsanitize=address
 //
 // #include <sanitizer/lsan_interface.h>
 import "C"

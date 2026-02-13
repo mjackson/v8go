@@ -18,11 +18,8 @@ jobs:
     name: Tests on ${{ matrix.os }} ${{ matrix.arch }} with Go ${{ matrix.go-version }}
     strategy:
       matrix:
-        # Temporary: the prebuilt Darwin V8 archives are currently missing
-        # temporal_rs symbol definitions and fail to link. Keep Linux green
-        # while V8 artifacts are regenerated.
-        os: [linux]
-        arch: [amd64]
+        os: [darwin, linux]
+        arch: [amd64, arm64]
         go-version:
         # Check the earliest and two trailing versions, to keep
         # maintainance of this file reasonable.
@@ -32,6 +29,8 @@ jobs:
         include:
         - os: linux
           platform: ubuntu-latest
+        - os: darwin
+          platform: macos-latest
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Checkout
@@ -44,11 +43,6 @@ jobs:
       with:
         go-version: ${{ matrix.go-version }}
 
-    - name: Install Clang and LLD
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y clang lld
-
     - name: Add GOPATH to GITHUB_ENV
       run: echo "GOPATH=$(go env GOPATH)" >>"$GITHUB_ENV"
 
@@ -59,18 +53,11 @@ jobs:
         go work init . $(ls ./deps/*_*/cgo.go | xargs -r dirname)
 
     - name: Run Tests With Coverage
-      # Temporary: with the upgraded V8 artifacts the Linux test binary
-      # crashes at startup in CI before test execution begins.
-      # Keep this non-blocking while the runtime crash is investigated.
-      continue-on-error: true
       run: |
         # https://github.com/tommie/v8go/actions/runs/7363603520/job/20043211523 shows that TestCPUProfileNode can be flaky.
         go test -v -coverprofile coverage.out ./... || go test -v -coverprofile coverage.out ./...
       env:
         CGO_CXXFLAGS: "-Werror"
-        CC: clang
-        CXX: clang++
-        CGO_LDFLAGS: -fuse-ld=lld
 
     - name: Upload Coverage To Codecov
       uses: codecov/codecov-action@v3
