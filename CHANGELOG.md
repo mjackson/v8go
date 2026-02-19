@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- Auto-bumped V8 to 14.5.201.7.
+- Auto-bumped V8 to 14.5.201.9.
 
 - Remove obsolete `20250331-stringhasher-arm64.patch`; the fix is now upstream in V8 and patch application fails as already-applied.
 
